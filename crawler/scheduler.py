@@ -13,7 +13,6 @@ class Scheduler(object):
         self.crawled_vids = {}
 
     def getCrawledVids(self):
-
         age = time.time() - self.crawled_vids.get('updated_at', 0)
         if age > 300:
             query = 'select views from views group by id;'
@@ -22,10 +21,7 @@ class Scheduler(object):
             self.crawled_vids['updated_at'] = time.time()
         return self.crawled_vids['data']
 
-    def checkInDb(self, vid):
-        pass
-
-    def _generateVID(self):
+    def schedule(self):
         payload = {}
         id_size = 11
         max_vid = 121
