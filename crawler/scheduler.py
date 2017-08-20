@@ -1,9 +1,22 @@
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
 import gearman
 import json
 import time
 
 from crawler import util
 from influxdb import InfluxDBClient
+
 
 class Scheduler(object):
     def __init__(self):
@@ -35,7 +48,7 @@ class Scheduler(object):
                 url = "https://www.youtube.com/watch?v=%s" % vid_str
                 payload[vid_str] = url
             elif payload != {}:
-                print "Sending job %s"%payload
-                req = self.gm_client.submit_job('process', json.dumps(payload),
-                    wait_until_complete=False, background=True)
+                print("Sending job %s" % payload)
+                self.gm_client.submit_job('process', json.dumps(
+                    payload), wait_until_complete=False, background=True)
                 payload = {}
