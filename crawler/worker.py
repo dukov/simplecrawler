@@ -14,6 +14,7 @@ import eventlet
 import gearman
 import json
 import logging
+import sys
 import uuid
 
 from crawler.driver import yt
@@ -51,3 +52,11 @@ class Worker(object):
 
     def run(self):
         self.gm_worker.work()
+
+
+def main():
+    wrkr = Worker()
+    wrkr.run()
+
+if __name__ == "__main__":
+    sys.exit(main())
