@@ -11,32 +11,21 @@
 # under the License.
 
 import eventlet
-import gearman
 import json
-import logging
 import sys
-import uuid
+
+from crawler import base_service
 
 from crawler.driver import yt
-from influxdb import InfluxDBClient
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-
-class Worker(object):
+class Worker(base_service.BaseService):
     def __init__(self):
+        super(Worker, self).__init__(['localhost:4730'])
         self.pool = eventlet.GreenPool()
         self.driver = yt.YouTubeDriver()
-        self.id = str(uuid.uuid4())
-        self.gm_worker = gearman.GearmanWorker(['localhost:4730'])
-        self.gm_worker.set_client_id(self.id)
-        self.gm_worker.register_task('process', self.processURLs)
-        self.db = InfluxDBClient('localhost', 8086, 'root', 'root', 'crawler')
-        self.db.create_database('crawler')
 
-    def processURLs(self, gm_w, job):
+    def rpc_processURLs(self, gm_w, job):
         print("Got new job for url %s" % job.data)
         urls = json.loads(job.data)
         report = []
@@ -48,15 +37,13 @@ class Worker(object):
 
     def reportResult(self, res):
         print(res)
-        self.db.write_points(res)
-
-    def run(self):
-        self.gm_worker.work()
+        self.rpc_client.rpc_call('rpc_update_db', json.dumps(res))
 
 
 def main():
     wrkr = Worker()
     wrkr.run()
+
 
 if __name__ == "__main__":
     sys.exit(main())

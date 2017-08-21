@@ -10,7 +10,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import gearman
 import json
 import time
 
@@ -20,7 +19,7 @@ from influxdb import InfluxDBClient
 
 class Scheduler(object):
     def __init__(self):
-        self.gm_client = gearman.GearmanClient(['localhost:4730'])
+        super(Scheduler, self).__init__(['localhost:4730'])
         self.db = InfluxDBClient('localhost', 8086, 'root', 'root', 'crawler')
         self.db.create_database('crawler')
         self.crawled_vids = {}
@@ -34,11 +33,12 @@ class Scheduler(object):
             self.crawled_vids['updated_at'] = time.time()
         return self.crawled_vids['data']
 
-    def schedule(self):
+    def rpc_schedule(self, gm_w, job):
+        task = json.loads(job.data)
         payload = {}
-        id_size = 11
-        max_vid = 121
-        batch = 10
+        id_size = task.get('id_size', 11)
+        max_vid = task.get('max_vid', 121)
+        batch = task.get('batch', 10)
 
         for int_vid, vid in util.vid_gen(max_vid, id_size):
             if len(payload) < batch and int_vid < max_vid - batch:
