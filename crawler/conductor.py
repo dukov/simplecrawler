@@ -25,3 +25,12 @@ class Conductor(base_service.BaseService):
     def rpc_update_db(self, gm_w, job):
         results = json.loads(job.data)
         self.db.write_points(results)
+
+
+def main():
+    wrkr = Worker()
+    wrkr.run()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

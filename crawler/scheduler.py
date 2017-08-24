@@ -52,3 +52,12 @@ class Scheduler(object):
                 self.gm_client.submit_job('process', json.dumps(
                     payload), wait_until_complete=False, background=True)
                 payload = {}
+
+
+def main():
+    wrkr = Worker()
+    wrkr.run()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
