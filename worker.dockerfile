@@ -14,6 +14,7 @@ RUN set -x \
   && rm -r /var/lib/apt/lists/*
 
 COPY .git            /project/.git
+COPY containerizarion/files/entrypoint_worker.sh /entrypoint.sh
 
 RUN set -x \
   && apt-get update \
@@ -26,9 +27,6 @@ RUN set -x \
   && wget --no-check-certificate https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb \
   && dpkg -i dumb-init_1.2.0_amd64.deb \
   && rm dumb-init_*.deb \
-  && wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/v0.3.0/dockerize-linux-amd64-v0.3.0.tar.gz \
-  && tar -C /usr/local/bin -xzf dockerize-linux-amd64-v0.3.0.tar.gz \
-  && rm dockerize-linux-amd64-v0.3.0.tar.gz \
   && pip --no-cache-dir --disable-pip-version-check install 'setuptools==32.3.1' \
   && cd /project \
   && git reset --hard \
@@ -41,5 +39,5 @@ RUN set -x \
   && rm -r /project \
   && rm -r /var/lib/apt/lists/*
 
-ENTRYPOINT ["/usr/bin/dumb-init", "-c", "--"]
-CMD ["dockerize", "--", "scworker"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["scworker"]

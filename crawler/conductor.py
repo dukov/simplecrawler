@@ -31,7 +31,7 @@ class Conductor(base_service.BaseService):
         self.db.write_points(results)
 
 
-def main(args):
+def main():
     CONF = cfg.CONF
     CONF.register_cli_opts(COMMON_OPTIONS)
     CONF(sys.argv[1:])
@@ -40,4 +40,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())
