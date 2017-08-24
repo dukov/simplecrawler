@@ -15,13 +15,16 @@ import json
 import sys
 
 from crawler import base_service
+from oslo_config import cfg
 
+from crawler.config import COMMON_OPTIONS
 from crawler.driver import yt
 
 
 class Worker(base_service.BaseService):
-    def __init__(self):
-        super(Worker, self).__init__(['localhost:4730'])
+    def __init__(self, conf):
+        super(Worker, self).__init__(conf.gearman)
+        self.conf = conf
         self.pool = eventlet.GreenPool()
         self.driver = yt.YouTubeDriver()
 
@@ -40,10 +43,13 @@ class Worker(base_service.BaseService):
         self.rpc_client.rpc_call('rpc_update_db', json.dumps(res))
 
 
-def main():
-    wrkr = Worker()
+def main(args):
+    CONF = cfg.CONF
+    CONF.register_cli_opts(COMMON_OPTIONS)
+    CONF(sys.argv[1:])
+    wrkr = Worker(CONF)
     wrkr.run()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))

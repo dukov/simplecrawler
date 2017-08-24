@@ -15,11 +15,15 @@ import time
 
 from crawler import util
 from influxdb import InfluxDBClient
+from oslo_config import cfg
+
+from crawler.config import COMMON_OPTIONS
 
 
 class Scheduler(object):
-    def __init__(self):
-        super(Scheduler, self).__init__(['localhost:4730'])
+    def __init__(self, conf):
+        super(Scheduler, self).__init__(conf.gearman)
+        self.conf = conf
         self.db = InfluxDBClient('localhost', 8086, 'root', 'root', 'crawler')
         self.db.create_database('crawler')
         self.crawled_vids = {}
@@ -54,10 +58,13 @@ class Scheduler(object):
                 payload = {}
 
 
-def main():
-    wrkr = Worker()
-    wrkr.run()
+def main(args):
+    CONF = cfg.CONF
+    CONF.register_cli_opts(COMMON_OPTIONS)
+    CONF(sys.argv[1:])
+    sched = Scheduler(CONF)
+    sched.run()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
