@@ -8,7 +8,7 @@ RUN set -x \
   && apt-get install -y --no-install-recommends \
     apt-transport-https \
     ca-certificates \
-  && apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase \
+  && apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall netbase \
   && apt-get clean \
   && apt-get autoremove --purge -y \
   && rm -r /var/lib/apt/lists/*
