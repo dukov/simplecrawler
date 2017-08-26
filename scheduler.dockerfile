@@ -14,6 +14,7 @@ RUN set -x \
   && rm -r /var/lib/apt/lists/*
 
 COPY .git            /project/.git
+COPY containerizarion/files/entrypoint_scheduler.sh /entrypoint.sh
 
 RUN set -x \
   && apt-get update \
@@ -38,5 +39,5 @@ RUN set -x \
   && rm -r /project \
   && rm -r /var/lib/apt/lists/*
 
-ENTRYPOINT ["/usr/bin/dumb-init", "-c", "--"]
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["scworker"]
