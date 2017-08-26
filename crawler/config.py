@@ -16,7 +16,13 @@ COMMON_OPTIONS = [
     cfg.ListOpt(
         'gearman',
         default=['localhost:4730'],
-        help=('List of gearman servers in HOST:PORT formati')
+        help=('List of gearman servers in HOST:PORT format')
     ),
-]
+    cfg.ListOpt(
+        'db_uri',
+        default=['influx://localhost:8086/crawler'],
+        help=('List of InfluxDB servers
+            in schema://user:password@host:port/db_name format')
+    ),
 
+]

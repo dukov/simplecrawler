@@ -16,6 +16,7 @@ import time
 from crawler import util
 from influxdb import InfluxDBClient
 from oslo_config import cfg
+from urlparse import urlparse
 
 from crawler.config import COMMON_OPTIONS
 
@@ -24,7 +25,14 @@ class Scheduler(object):
     def __init__(self, conf):
         super(Scheduler, self).__init__(conf.gearman)
         self.conf = conf
-        self.db = InfluxDBClient('localhost', 8086, 'root', 'root', 'crawler')
+        db_params = urlparse(self.conf.db_uri)
+        self.db = InfluxDBClient(
+            db_params.host,
+            db_params.port,
+            db_params.username,
+            db_params.password,
+            db_params.path[1:]
+        )
         self.db.create_database('crawler')
         self.crawled_vids = {}
 
