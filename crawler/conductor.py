@@ -11,24 +11,25 @@
 # under the License.
 
 import json
+import sys
 
 from crawler import base_service
-from influxdb import InfluxDBClient
 from oslo_config import cfg
 
 from crawler.config import COMMON_OPTIONS
+from crawler.db import collection
 
 
 class Conductor(base_service.BaseService):
     def __init__(self, conf):
         super(Conductor, self).__init__(conf.gearman)
+        self.dbc = collection.DBCollection(conf.db_uris)
         self.conf = conf
-        self.db = InfluxDBClient('localhost', 8086, 'root', 'root', 'crawler')
-        self.db.create_database('crawler')
 
     def rpc_update_db(self, gm_w, job):
         results = json.loads(job.data)
-        self.db.write_points(results)
+        self.dbc.write_data(results)
+        return ""
 
 
 def main():

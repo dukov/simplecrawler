@@ -10,19 +10,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
-
-COMMON_OPTIONS = [
-    cfg.ListOpt(
-        'gearman',
-        default=['localhost:4730'],
-        help=('List of gearman servers in HOST:PORT format')
-    ),
-    cfg.ListOpt(
-        'db_uris',
-        default=['influx://localhost:8086/crawler'],
-        help=('List of InfluxDB servers \
-            in schema://user:password@host:port/db_name format')
-    ),
-
-]
+DB_DRIVER_MAP = {
+    'influx': 'crawler.db.influx.DBInflux',
+}
