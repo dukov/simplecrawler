@@ -3,30 +3,23 @@ MAINTAINER Dmitry Ukov
 
 ENV DEBIAN_FRONTEND=noninteractive LC_ALL=C.UTF-8 LANG=C.UTF-8 PIP_INDEX_URL=${pip_index_url:-https://pypi.python.org/simple/}
 
-RUN set -x \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends \
-    apt-transport-https \
-    ca-certificates \
-  && apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall netbase \
-  && apt-get clean \
-  && apt-get autoremove --purge -y \
-  && rm -r /var/lib/apt/lists/*
-
 COPY .git            /project/.git
 COPY containerizarion/files/entrypoint_conductor.sh /entrypoint.sh
 
 RUN set -x \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
+    apt-transport-https \
+    ca-certificates \
+  && apt-get update \
+  && apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall netbase \
+  && apt-get install -y --no-install-recommends \
+    build-essential \
     python \
     python-dev \
     python-pip \
     git \
     wget \
-  && wget --no-check-certificate https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb \
-  && dpkg -i dumb-init_1.2.0_amd64.deb \
-  && rm dumb-init_*.deb \
   && pip --no-cache-dir --disable-pip-version-check install 'setuptools==32.3.1' \
   && cd /project \
   && git reset --hard \
@@ -40,4 +33,4 @@ RUN set -x \
   && rm -r /var/lib/apt/lists/*
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["scworker"]
+CMD ["scconductor"]
