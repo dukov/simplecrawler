@@ -14,6 +14,7 @@ RUN set -x \
   && apt-get update \
   && apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall netbase \
   && apt-get install -y --no-install-recommends \
+    build-essential \
     python \
     python-dev \
     python-pip \
