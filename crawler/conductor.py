@@ -27,6 +27,7 @@ class Conductor(base_service.BaseService):
         self.conf = conf
 
     def rpc_update_db(self, gm_w, job):
+        print "Got data"
         results = json.loads(job.data)
         self.dbc.write_data(results)
         return ""

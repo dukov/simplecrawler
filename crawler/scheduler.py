@@ -44,7 +44,7 @@ class Scheduler(base_service.BaseService):
                 payload[vid_str] = url
             elif payload != {}:
                 print("Sending job %s" % payload)
-                self.gm_client.submit_job('process', json.dumps(
+                self.rpc_client.rpc_call('rpc_processURLs', json.dumps(
                     payload), wait_until_complete=False, background=True)
                 payload = {}
         return ""

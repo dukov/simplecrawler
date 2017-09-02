@@ -10,13 +10,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
+
 from influxdb import InfluxDBClient
 from urlparse import urlparse
 
 
 class DBInflux(object):
     def __init__(self, uri):
-        import pdb;pdb.set_trace()
         db_params = urlparse(uri)
         self.db = InfluxDBClient(
             db_params.hostname,
