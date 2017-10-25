@@ -39,5 +39,7 @@ class DBInflux(object):
         return self.crawled_vids['data']
 
     def write(self, data):
-        self.db.write_points(data)
+        views = data.get('fields', {}).get('views', 0)
+        if views != 0:
+            self.db.write_points(data)
 
