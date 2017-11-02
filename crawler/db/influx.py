@@ -39,7 +39,10 @@ class DBInflux(object):
         return self.crawled_vids['data']
 
     def write(self, data):
-        views = data.get('fields', {}).get('views', 0)
-        if views != 0:
-            self.db.write_points(data)
+        metrincs = []
+        for item in data:
+            views = item.get('fields', {}).get('views', 0)
+            if views != 0:
+                metrincs.append(item)
+        self.db.write_points(metrincs)
 

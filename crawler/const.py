@@ -10,6 +10,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import string
+
+
 DB_DRIVER_MAP = {
     'influx': 'crawler.db.influx.DBInflux',
 }
+VID_DIGITS = string.ascii_lowercase + string.ascii_uppercase
+VID_DIGITS += string.digits + '_' + '-'

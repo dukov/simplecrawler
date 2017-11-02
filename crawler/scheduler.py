@@ -29,15 +29,18 @@ class Scheduler(base_service.BaseService):
         self.conf = conf
 
     def rpc_schedule(self, gm_w, job):
+        print "Got rquest %s" % job.data
         task = json.loads(job.data)
         payload = {}
-        id_size = task.get('id_size', 11)
-        max_vid = task.get('max_vid', 121)
+        vid1 = util.vid2int(task.get('vid1', '7-Sl8uXOb5k'))
+        vid2 = util.vid2int(task.get('vid2', '7-Sl8uXOb5t'))
+        start_vid = min(vid1, vid2)
+        stop_vid = max(vid1,vid2)
         batch = task.get('batch', 10)
 
-        for int_vid, vid in util.vid_gen(max_vid, id_size):
-            if len(payload) < batch and int_vid < max_vid - batch:
-                vid_str = ''.join(vid)
+        for int_vid in util.vid_gen(start_vid, stop_vid):
+            vid_str = util.int2vid(int_vid)
+            if len(payload) < batch and int_vid < stop_vid + 1 - batch or payload == {}:
                 if vid_str in self.dbc.getCrawledVids():
                     continue
                 url = "https://www.youtube.com/watch?v=%s" % vid_str

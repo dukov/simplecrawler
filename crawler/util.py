@@ -10,21 +10,35 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from crawler.const import VID_DIGITS
 import string
 
+def vid2int(vid):
+    res = 0
+    for pos, digit in enumerate(vid):
+        power = len(vid)-1-pos
+        res+= VID_DIGITS.index(digit)*len(VID_DIGITS)**power
 
-def vid_gen(end, num_digits):
-    digits = string.ascii_lowercase + string.ascii_uppercase + string.digits
-    i = 0
-    while i <= end:
-        k = i
-        res = []
-        while True:
-            res.append(digits[k % 62])
-            k = k / 62
-            if k == 0:
-                break
-        if num_digits > len(res):
-            res += [digits[0]] * (num_digits - len(res))
-        yield i, list(reversed(res))
-        i += 1
+    return res
+
+def int2vid(i):
+    res = []
+    base = len(VID_DIGITS)
+    div = i
+    while True:
+        if div < base:
+            res.append(VID_DIGITS[div])
+            break
+        else:
+            res.append(VID_DIGITS[div % base])
+            div = div/base
+    res.reverse()
+    return ''.join(res)
+
+# TODO (dukov) Deprecate this
+def vid_gen(start, stop):
+    while start <= stop:
+        yield start
+        start += 1
+
+
