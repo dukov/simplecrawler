@@ -40,16 +40,23 @@ class Scheduler(base_service.BaseService):
 
         for int_vid in util.vid_gen(start_vid, stop_vid):
             vid_str = util.int2vid(int_vid)
-            if len(payload) < batch and int_vid < stop_vid + 1 - batch or payload == {}:
-                if vid_str in self.dbc.getCrawledVids():
-                    continue
+            if len(payload) < batch:
                 url = "https://www.youtube.com/watch?v=%s" % vid_str
                 payload[vid_str] = url
-            elif payload != {}:
+            else:
                 print("Sending job %s" % payload)
-                self.rpc_client.rpc_call('rpc_processURLs', json.dumps(
-                    payload), wait_until_complete=False, background=True)
+                self.rpc_client.rpc_call('rpc_processURLs',
+                                         json.dumps(payload),
+                                         wait_until_complete=False,
+                                         background=True)
                 payload = {}
+        # Send what's left
+        if len(payload) > 0:
+           print("Sending job %s" % payload)
+           self.rpc_client.rpc_call('rpc_processURLs',
+                                    json.dumps(payload),
+                                    wait_until_complete=False,
+                                    background=True)
         return ""
 
 
