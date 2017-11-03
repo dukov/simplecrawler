@@ -4,7 +4,7 @@ MAINTAINER Dmitry Ukov
 ENV DEBIAN_FRONTEND=noninteractive LC_ALL=C.UTF-8 LANG=C.UTF-8 PIP_INDEX_URL=${pip_index_url:-https://pypi.python.org/simple/}
 
 COPY .git            /project/.git
-COPY containerizarion/files/entrypoint_scheduler.sh /entrypoint.sh
+COPY containerizarion/files/entrypoint.sh /entrypoint.sh
 
 RUN set -x \
   && apt-get update \
@@ -33,4 +33,3 @@ RUN set -x \
   && rm -r /var/lib/apt/lists/*
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["sccheduler"]
