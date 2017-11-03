@@ -24,6 +24,7 @@ from crawler.config import COMMON_OPTIONS
 
 urls = (
         '/', 'Urls',
+        '/status', 'Status',
         '/agents', 'AgentCollection',
         '/jobs', 'JobCollection',
 )
@@ -32,19 +33,31 @@ class Urls:
     def GET(self):
         return json.dumps(urls)
 
+class Status:
+
+    def GET(self):
+        gm_admin_client = gearman.GearmanAdminClient(CONF.gearman)
+        return json.dumps(gm_admin_client.get_status())
+
 class AgentCollection:
 
     def GET(self):
+        gm_admin_client = gearman.GearmanAdminClient(CONF.gearman)
         return json.dumps(gm_admin_client.get_workers())
 
 
 class JobCollection:
-    pass
+
+    def POST(self):
+        data = web.data()
+        gm_client = gearman.GearmanClient(CONF.gearman)
+        job = gm_client.submit_job('rpc_schedule', data,
+                wait_until_complete=False, background=True)
+        return job
 
 CONF = cfg.CONF
 if __name__ == '__main__':
     CONF.register_cli_opts(COMMON_OPTIONS)
     CONF(sys.argv[2:])
-    gm_admin_client = gearman.GearmanAdminClient(CONF.gearman)
     app = web.application(urls, globals(), autoreload=False)
     app.run()
