@@ -55,9 +55,13 @@ class JobCollection:
                 wait_until_complete=False, background=True)
         return job
 
-CONF = cfg.CONF
-if __name__ == '__main__':
+def main():
     CONF.register_cli_opts(COMMON_OPTIONS)
     CONF(sys.argv[2:])
-    app = web.application(urls, globals(), autoreload=False)
     app.run()
+
+
+CONF = cfg.CONF
+app = web.application(urls, globals(), autoreload=False)
+if __name__ == '__main__':
+    main()
