@@ -4,3 +4,4 @@ eventlet==0.21.
 oslo.config==4.11.0
 oslo.utils==3.28.0
 web.py==0.38
+plyvel
