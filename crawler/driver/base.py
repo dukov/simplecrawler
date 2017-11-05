@@ -17,7 +17,7 @@ class BaseDriver(object):
 
     def getData(self, tgt):
         vid, url = tgt
-        data = urllib2.urlopen(url, timeout=1).readlines()
+        data = urllib2.urlopen(url, timeout=5).readlines()
         return self.parseData(data, vid, url)
 
     def parseData(self):
