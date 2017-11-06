@@ -15,6 +15,7 @@ import string
 
 DB_DRIVER_MAP = {
     'influx': 'crawler.db.influx.DBInflux',
+    'levelup': 'crawler.db.levelup.DBLevelUP',
 }
 VID_DIGITS = string.ascii_lowercase + string.ascii_uppercase
 VID_DIGITS += string.digits + '_' + '-'
