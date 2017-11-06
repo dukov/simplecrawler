@@ -20,6 +20,7 @@ RUN set -x \
     python-pip \
     git \
     wget \
+    libleveldb-dev \
   && pip --no-cache-dir --disable-pip-version-check install 'setuptools==32.3.1' \
   && cd /project \
   && git reset --hard \
