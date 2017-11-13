@@ -25,7 +25,6 @@ from crawler.db import collection
 class Scheduler(base_service.BaseService):
     def __init__(self, conf):
         super(Scheduler, self).__init__(conf.gearman)
-        self.dbc = collection.DBCollection(conf.db_uris)
         self.conf = conf
 
     def rpc_schedule(self, gm_w, job):
