@@ -51,11 +51,12 @@ class Scheduler(base_service.BaseService):
                 payload = {}
         # Send what's left
         if len(payload) > 0:
-           print("Sending job %s" % payload)
-           self.rpc_client.rpc_call('rpc_processURLs',
-                                    json.dumps(payload),
-                                    wait_until_complete=False,
-                                    background=True)
+            print("Sending job %s" % payload)
+            self.rpc_client.rpc_call('rpc_processURLs',
+                                     json.dumps(payload),
+                                     wait_until_complete=False,
+                                     background=True)
+
         return ""
 
 
