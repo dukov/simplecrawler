@@ -30,6 +30,7 @@ class DBInflux(object):
         self.crawled_vids = {}
 
     def getVIDs(self):
+        return {}
         age = time.time() - self.crawled_vids.get('updated_at', 0)
         if age > 300:
             query = 'select views from views group by id;'

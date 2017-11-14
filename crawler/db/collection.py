@@ -24,9 +24,9 @@ class DBCollection(object):
              self.dbs.append(db(uri))
 
     def getCrawledVids(self):
-        res = []
+        res = {}
         for db in self.dbs:
-            res += db.getVIDs()
+            res.update(db.getVIDs())
         return res
 
     def write_data(self, data):

@@ -11,6 +11,7 @@
 # under the License.
 
 import json
+import plyvel
 import time
 import sys
 
@@ -19,16 +20,23 @@ from crawler import util
 from oslo_config import cfg
 
 from crawler.config import COMMON_OPTIONS
-from crawler.db import collection
 
 
 class Scheduler(base_service.BaseService):
     def __init__(self, conf):
         super(Scheduler, self).__init__(conf.gearman)
         self.conf = conf
+        self.cache = plyvel.DB('/tmp/cache', create_if_missing=True)
+
+    def _update_cache(self):
+        data = self.rpc_client.rpc_call('rpc_get_crawled', '').result
+        with self.cache.write_batch() as wb:
+            for k,v in json.loads(data).items():
+                wb.set(k,v)
 
     def rpc_schedule(self, gm_w, job):
         print "Got rquest %s" % job.data
+        self._update_cache()
         task = json.loads(job.data)
         payload = {}
         vid1 = util.vid2int(task.get('vid1', '7-Sl8uXOb5k'))
@@ -39,16 +47,17 @@ class Scheduler(base_service.BaseService):
 
         for int_vid in util.vid_gen(start_vid, stop_vid):
             vid_str = util.int2vid(int_vid)
-            if len(payload) < batch:
-                url = "https://www.youtube.com/watch?v=%s" % vid_str
-                payload[vid_str] = url
-            else:
-                print("Sending job %s" % payload)
-                self.rpc_client.rpc_call('rpc_processURLs',
-                                         json.dumps(payload),
-                                         wait_until_complete=False,
-                                         background=True)
-                payload = {}
+            if not self.cache.get(vid_str):
+                if len(payload) < batch:
+                    url = "https://www.youtube.com/watch?v=%s" % vid_str
+                    payload[vid_str] = url
+                else:
+                    print("Sending job %s" % payload)
+                    self.rpc_client.rpc_call('rpc_processURLs',
+                                             json.dumps(payload),
+                                             wait_until_complete=False,
+                                             background=True)
+                    payload = {}
         # Send what's left
         if len(payload) > 0:
             print("Sending job %s" % payload)

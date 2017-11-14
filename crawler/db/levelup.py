@@ -12,11 +12,17 @@
 
 import plyvel
 
+from urlparse import urlparse
+
 class DBLevelUP(object):
-    def __init__(self):
-        self.db = plyvel.DB('/var/lib/crawler/', create_if_missing=True)
+    def __init__(self, uri):
+        db_params = urlparse(uri)
+        self.db = plyvel.DB(db_params.path, create_if_missing=True)
 
     def write(self, data):
         with self.db.write_batch() as wb:
             for item in data:
-                wb.put(item['tags']['id'],item['fields']['views'])
+                wb.put(str(item['tags']['id']), str(item['fields']['views']))
+
+    def getVIDs(self):
+        return list(self.db)

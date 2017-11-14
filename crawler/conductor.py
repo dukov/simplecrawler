@@ -32,6 +32,10 @@ class Conductor(base_service.BaseService):
         self.dbc.write_data(results)
         return ""
 
+    def rpc_get_crawled(self, gm_w, job):
+        vids = self.dbc.getCrawledVids()
+        return json.dumps(vids)
+
 
 def main():
     CONF = cfg.CONF
