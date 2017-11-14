@@ -25,7 +25,7 @@ class RPCGearman(object):
         self.reciever.register_task(task_name, func)
 
     def rpc_call(self, method, data, **kwargs):
-        self.sender.submit_job(method, data, **kwargs)
+        return self.sender.submit_job(method, data, **kwargs)
 
     def run(self):
         self.reciever.work()
