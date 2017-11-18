@@ -26,4 +26,5 @@ class BaseService(object):
                 self.rpc_client.register_task(method, func)
 
     def run(self):
+        print("Starting Service")
         self.rpc_client.run()

@@ -26,16 +26,26 @@ class Scheduler(base_service.BaseService):
     def __init__(self, conf):
         super(Scheduler, self).__init__(conf.gearman)
         self.conf = conf
-        self.cache = plyvel.DB('/tmp/cache', create_if_missing=True)
+        print("Creating cache DB")
+        try:
+            self.cache = plyvel.DB('/tmp/cache', create_if_missing=True)
+        except:
+            print("Failed to setup cache DB")
+            raise
 
     def _update_cache(self):
+        print("Loading cache to DB")
         data = self.rpc_client.rpc_call('rpc_get_crawled', '').result
         with self.cache.write_batch() as wb:
-            for k,v in json.loads(data).items():
-                wb.set(k,v)
+            try:
+                for k,v in json.loads(data).items():
+                    wb.set(k,v)
+            except:
+                print("Failed to load cache")
+                raise
 
     def rpc_schedule(self, gm_w, job):
-        print "Got rquest %s" % job.data
+        print("Got rquest %s" % job.data)
         self._update_cache()
         task = json.loads(job.data)
         payload = {}
@@ -49,6 +59,7 @@ class Scheduler(base_service.BaseService):
             vid_str = util.int2vid(int_vid)
             if not self.cache.get(vid_str):
                 if len(payload) < batch:
+                    # TODO do re-factoring here. Move URL to consts
                     url = "https://www.youtube.com/watch?v=%s" % vid_str
                     payload[vid_str] = url
                 else:
@@ -58,7 +69,7 @@ class Scheduler(base_service.BaseService):
                                              wait_until_complete=False,
                                              background=True)
                     payload = {}
-        # Send what's left
+        # NOTE Send what's left
         if len(payload) > 0:
             print("Sending job %s" % payload)
             self.rpc_client.rpc_call('rpc_processURLs',
