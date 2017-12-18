@@ -13,6 +13,7 @@
 import uuid
 
 from crawler.driver import rpc_gearman
+from crawler.logger import logger
 
 
 class BaseService(object):
@@ -26,5 +27,5 @@ class BaseService(object):
                 self.rpc_client.register_task(method, func)
 
     def run(self):
-        print("Starting Service")
+        logger.info("Starting Service")
         self.rpc_client.run()

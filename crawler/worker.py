@@ -19,17 +19,19 @@ from oslo_config import cfg
 
 from crawler.config import COMMON_OPTIONS
 from crawler.driver import yt
+from crawler.logger import logger
 
 
 class Worker(base_service.BaseService):
     def __init__(self, conf):
+        logger.debug("Initialising worker")
         super(Worker, self).__init__(conf.gearman)
         self.conf = conf
         self.pool = eventlet.GreenPool()
         self.driver = yt.YouTubeDriver()
 
     def rpc_processURLs(self, gm_w, job):
-        print("Got new job for url %s" % job.data)
+        logger.info("Got new job for url %s" % job.data)
         urls = json.loads(job.data)
         report = []
         for res in self.pool.imap(self.driver.getData, urls.items()):
@@ -39,7 +41,7 @@ class Worker(base_service.BaseService):
         return ""
 
     def reportResult(self, res):
-        print(res)
+        logger.debug("Reporting result %s" % res)
         self.rpc_client.rpc_call('rpc_update_db', json.dumps(res))
 
 

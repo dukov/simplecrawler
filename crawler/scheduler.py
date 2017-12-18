@@ -20,32 +20,33 @@ from crawler import util
 from oslo_config import cfg
 
 from crawler.config import COMMON_OPTIONS
+from crawler.logger import logger
 
 
 class Scheduler(base_service.BaseService):
     def __init__(self, conf):
         super(Scheduler, self).__init__(conf.gearman)
         self.conf = conf
-        print("Creating cache DB")
+        logger.info("Creating cache DB")
         try:
             self.cache = plyvel.DB('/tmp/cache', create_if_missing=True)
         except:
-            print("Failed to setup cache DB")
+            logger.error("Failed to setup cache DB")
             raise
 
     def _update_cache(self):
-        print("Loading cache to DB")
+        logger.info("Loading cache to DB")
         data = self.rpc_client.rpc_call('rpc_get_crawled', '').result
         with self.cache.write_batch() as wb:
             try:
                 for k,v in json.loads(data).items():
                     wb.set(k,v)
             except:
-                print("Failed to load cache")
+                logger.error("Failed to load cache")
                 raise
 
     def rpc_schedule(self, gm_w, job):
-        print("Got rquest %s" % job.data)
+        logger.info("Got rquest %s" % job.data)
         self._update_cache()
         task = json.loads(job.data)
         payload = {}
@@ -63,7 +64,7 @@ class Scheduler(base_service.BaseService):
                     url = "https://www.youtube.com/watch?v=%s" % vid_str
                     payload[vid_str] = url
                 else:
-                    print("Sending job %s" % payload)
+                    logger.debug("Sending job %s" % payload)
                     self.rpc_client.rpc_call('rpc_processURLs',
                                              json.dumps(payload),
                                              wait_until_complete=False,
@@ -71,7 +72,7 @@ class Scheduler(base_service.BaseService):
                     payload = {}
         # NOTE Send what's left
         if len(payload) > 0:
-            print("Sending job %s" % payload)
+            logger.debug("Sending job %s" % payload)
             self.rpc_client.rpc_call('rpc_processURLs',
                                      json.dumps(payload),
                                      wait_until_complete=False,
